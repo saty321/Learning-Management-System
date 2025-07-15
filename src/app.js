@@ -23,12 +23,12 @@ app.use(cookieParser())
 
 // Route imports
 import { router as userRouter } from "./routes/user.route.js"
-import { router as authRouter } from "./routes/auth.route.js"
+import { router as courseRouter } from "./routes/course.route.js"
 
 
 // Routes declaration
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/course", courseRouter);
 
 // Handle 404
 app.use((req, res) => {
