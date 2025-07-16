@@ -159,21 +159,214 @@ const getAllCourses = asyncHandler(async (req, res) => {
 });
 
 // Public - Get Course Details
+// const getCourseDetails = asyncHandler(async (req, res) => {
+//     const { courseId } = req.params;
+    
+//     // Validate courseId
+//     if (!mongoose.isValidObjectId(courseId)) {
+//         throw new ApiError(400, "Invalid course ID");
+//     }
+
+//     const courseDetails = await Course.aggregate([
+//         {
+//             $match: {
+//                 _id: new mongoose.Types.ObjectId(courseId)
+//             }
+//         },
+//         {
+//             $lookup: {
+//                 from: "lessons", // Collection name for lessons
+//                 localField: "_id",
+//                 foreignField: "course",
+//                 as: "lessons",
+//                 let: { courseId: { $toString: "$_id" } },
+//                 pipeline: [
+//                     {
+//                         $match: {
+//                             $expr: { $eq: ["$course", "$courseId"] }
+//                         }
+//                     }],
+//                 pipeline: [
+//                     {
+//                         $project: {
+//                             title: 1,
+//                             order: 1,
+//                             duration: 1,
+//                             isPublished: 1,
+//                             _id: 1
+//                         }
+//                     },
+//                     {
+//                         $sort: { order: 1 }
+//                     }
+//                 ]
+//             }
+//         },
+//         {
+//             $lookup: {
+//                 from: "quizzes", // Collection name for quizzes
+//                 localField: "_id",
+//                 foreignField: "course",
+//                 as: "quizzes",
+//                 pipeline: [
+//                     {
+//                         $project: {
+//                             title: 1,
+//                             order: 1,
+//                             passingScore: 1,
+//                             timeLimit: 1,
+//                             maxAttempts: 1,
+//                             isPublished: 1,
+//                             _id: 1
+//                         }
+//                     },
+//                     {
+//                         $sort: { order: 1 }
+//                     }
+//                 ]
+//             }
+//         },
+//         {
+//             $addFields: {
+//                 totalLessons: { $size: "$lessons" },
+//                 totalQuizzes: { $size: "$quizzes" },
+//                 publishedLessons: {
+//                     $size: {
+//                         $filter: {
+//                             input: "$lessons",
+//                             cond: { $eq: ["$$this.isPublished", true] }
+//                         }
+//                     }
+//                 },
+//                 publishedQuizzes: {
+//                     $size: {
+//                         $filter: {
+//                             input: "$quizzes",
+//                             cond: { $eq: ["$$this.isPublished", true] }
+//                         }
+//                     }
+//                 },
+//                 totalDuration: {
+//                     $sum: "$lessons.duration"
+//                 }
+//             }
+//         }
+//     ]);
+
+//     if (!courseDetails || courseDetails.length === 0) {
+//         throw new ApiError(404, "Course not found");
+//     }
+
+//     const course = courseDetails[0];
+
+//     return res.status(200).json(
+//         new ApiResponse(200, course, "Course details with lessons and quizzes fetched successfully")
+//     );
+// });
+
 const getCourseDetails = asyncHandler(async (req, res) => {
     const { courseId } = req.params;
-
+    
     // Validate courseId
     if (!mongoose.isValidObjectId(courseId)) {
         throw new ApiError(400, "Invalid course ID");
     }
 
-    const course = await Course.findById(courseId);
-    if (!course) {
+    const courseDetails = await Course.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(courseId)
+            }
+        },
+        {
+            $lookup: {
+                from: "lessons", // Collection name for lessons
+                let: { courseId: { $toString: "$_id" } },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: { $eq: ["$course", "$$courseId"] }
+                        }
+                    },
+                    {
+                        $project: {
+                            title: 1,
+                            order: 1,
+                            duration: 1,
+                            isPublished: 1,
+                            _id: 1
+                        }
+                    },
+                    {
+                        $sort: { order: 1 }
+                    }
+                ],
+                as: "lessons"
+            }
+        },
+        {
+            $lookup: {
+                from: "quizzes", // Collection name for quizzes
+                let: { courseId: { $toString: "$_id" } },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: { $eq: ["$course", "$$courseId"] }
+                        }
+                    },
+                    {
+                        $project: {
+                            title: 1,
+                            order: 1,
+                            passingScore: 1,
+                            timeLimit: 1,
+                            maxAttempts: 1,
+                            isPublished: 1,
+                            _id: 1
+                        }
+                    },
+                    {
+                        $sort: { order: 1 }
+                    }
+                ],
+                as: "quizzes"
+            }
+        },
+        {
+            $addFields: {
+                totalLessons: { $size: "$lessons" },
+                totalQuizzes: { $size: "$quizzes" },
+                publishedLessons: {
+                    $size: {
+                        $filter: {
+                            input: "$lessons",
+                            cond: { $eq: ["$this.isPublished", true] }
+                        }
+                    }
+                },
+                publishedQuizzes: {
+                    $size: {
+                        $filter: {
+                            input: "$quizzes",
+                            cond: { $eq: ["$this.isPublished", true] }
+                        }
+                    }
+                },
+                totalDuration: {
+                    $sum: "$lessons.duration"
+                }
+            }
+        }
+    ]);
+
+    if (!courseDetails || courseDetails.length === 0) {
         throw new ApiError(404, "Course not found");
     }
 
+    const course = courseDetails[0];
+
     return res.status(200).json(
-        new ApiResponse(200, course, "Course details fetched successfully")
+        new ApiResponse(200, course, "Course details with lessons and quizzes fetched successfully")
     );
 });
 

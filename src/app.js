@@ -24,11 +24,21 @@ app.use(cookieParser())
 // Route imports
 import { router as userRouter } from "./routes/user.route.js"
 import { router as courseRouter } from "./routes/course.route.js"
+import { router as lessonRouter } from "./routes/lesson.route.js"
+import { router as quizRouter } from "./routes/quiz.route.js"
+import { router as questionRouter } from "./routes/question.route.js"
+import { router as enrollmentRouter } from "./routes/enrollment.route.js"
+import { router as progressRouter } from "./routes/progress.route.js"
 
 
 // Routes declaration
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/course", courseRouter);
+app.use("/api/v1/lesson", lessonRouter);
+app.use("/api/v1/quiz", quizRouter);
+app.use("/api/v1/question", questionRouter);
+app.use("/api/v1/enrollment", enrollmentRouter);
+app.use("/api/v1/progress", progressRouter);
 
 // Handle 404
 app.use((req, res) => {
