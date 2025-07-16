@@ -29,6 +29,7 @@ import { router as quizRouter } from "./routes/quiz.route.js"
 import { router as questionRouter } from "./routes/question.route.js"
 import { router as enrollmentRouter } from "./routes/enrollment.route.js"
 import { router as progressRouter } from "./routes/progress.route.js"
+import { router as quizAttemptRouter } from "./routes/quizAttempt.route.js"
 
 
 // Routes declaration
@@ -39,6 +40,7 @@ app.use("/api/v1/quiz", quizRouter);
 app.use("/api/v1/question", questionRouter);
 app.use("/api/v1/enrollment", enrollmentRouter);
 app.use("/api/v1/progress", progressRouter);
+app.use("/api/v1/quizAttempt", quizAttemptRouter);
 
 // Handle 404
 app.use((req, res) => {
