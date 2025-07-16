@@ -1,11 +1,12 @@
 {
-  "name": "backend_with_chai_and_code",
+  "name": "learning_management_system",
   "version": "1.0.0",
   "description": "willing to lerarn bcakend in depth concept",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon -r dotenv/config --experimental-json-modules  src/index.js"
+    "start": "node -r dotenv/config --experimental-json-modules src/index.js",
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
   "repository": {
     "type": "git",
